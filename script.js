@@ -59,24 +59,22 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function placeInitialCandles(count) {
-  const icingRect = icing.getBoundingClientRect();
-  const cakeRect = cake.getBoundingClientRect();
+  // Wait a frame so the layout has happened
+  requestAnimationFrame(() => {
+    const icingRect = icing.getBoundingClientRect();
+    const cakeRect = cake.getBoundingClientRect();
 
-  for (let i = 0; i < count; i++) {
-    const x =
-      icingRect.left -
-      cakeRect.left +
-      Math.random() * icingRect.width;
+    for (let i = 0; i < count; i++) {
+      const x =
+        icingRect.left - cakeRect.left + Math.random() * icingRect.width;
 
-    const y =
-      icingRect.top -
-      cakeRect.top +
-      Math.random() * icingRect.height;
+      const y =
+        icingRect.top - cakeRect.top + Math.random() * icingRect.height;
 
-    addCandle(x, y);
-  }
+      addCandle(x, y);
+    }
+  });
 }
-
   cake.addEventListener("click", function (event) {
     const icingRect = icing.getBoundingClientRect();
 

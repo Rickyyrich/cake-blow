@@ -7,7 +7,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center;   /* ← THIS centers cake + banner */
 }
 
 /* =======================
@@ -41,9 +41,12 @@ body {
    CAKE CONTAINER
    ======================= */
 .cake {
-  position: relative;      /* needed for candles */
+  position: relative;
   width: 250px;
   height: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
 }
 
 /* =======================

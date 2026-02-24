@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   const cake = document.querySelector(".cake");
   const candleCountDisplay = document.getElementById("candleCount");
+  const birthdayMessage = document.getElementById("birthdayMessage");
+
   const params = new URLSearchParams(window.location.search);
-  let candleCount = parseInt(params.get("candles")) || 27;
+  let initialCandleCount = parseInt(params.get("candles")) || 27;
+
+  let candles = [];
   let audioContext;
   let analyser;
   let microphone;
@@ -11,7 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const activeCandles = candles.filter(
       (candle) => !candle.classList.contains("out")
     ).length;
+
     candleCountDisplay.textContent = activeCandles;
+
+    if (activeCandles === 0 && birthdayMessage) {
+      birthdayMessage.style.display = "block";
+    }
   }
 
   function addCandle(left, top) {
@@ -27,6 +36,16 @@ document.addEventListener("DOMContentLoaded", function () {
     cake.appendChild(candle);
     candles.push(candle);
     updateCandleCount();
+  }
+
+  function addInitialCandles(count) {
+    const rect = cake.getBoundingClientRect();
+
+    for (let i = 0; i < count; i++) {
+      const left = Math.random() * (rect.width - 20) + 10;
+      const top = Math.random() * (rect.height - 40) + 10;
+      addCandle(left, top);
+    }
   }
 
   cake.addEventListener("click", function (event) {
@@ -45,27 +64,30 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 0; i < bufferLength; i++) {
       sum += dataArray[i];
     }
-    let average = sum / bufferLength;
 
-    return average > 40; //
+    let average = sum / bufferLength;
+    return average > 40;
   }
 
   function blowOutCandles() {
-    let blownOut = 0;
+    let blownOut = false;
 
     if (isBlowing()) {
       candles.forEach((candle) => {
         if (!candle.classList.contains("out") && Math.random() > 0.5) {
           candle.classList.add("out");
-          blownOut++;
+          blownOut = true;
         }
       });
     }
 
-    if (blownOut > 0) {
+    if (blownOut) {
       updateCandleCount();
     }
   }
+
+  // 🔥 Add candles immediately on load
+  addInitialCandles(initialCandleCount);
 
   if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices

@@ -206,13 +206,14 @@ body {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+} /* ✅ THIS WAS MISSING */
 
 .cake {
   position: relative;
 }
-    
+
 .candle {
   position: absolute;
-  z-index: 999;
+  z-index: 10;
 }
-    

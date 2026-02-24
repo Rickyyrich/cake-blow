@@ -39,33 +39,43 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addInitialCandles(count) {
-  const rect = cake.getBoundingClientRect();
+  const icing = cake.querySelector(".icing");
+  if (!icing) return;
 
-  const creamTopStart = rect.height * 0.05;  // 5% from top
-  const creamTopEnd   = rect.height * 0.30;  // 30% from top
+  const cakeRect = cake.getBoundingClientRect();
+  const icingRect = icing.getBoundingClientRect();
 
   for (let i = 0; i < count; i++) {
-    const left = Math.random() * (rect.width - 30) + 15;
+    const left =
+      icingRect.left - cakeRect.left +
+      Math.random() * (icingRect.width - 20) + 10;
+
     const top =
-      Math.random() * (creamTopEnd - creamTopStart) + creamTopStart;
+      icingRect.top - cakeRect.top +
+      Math.random() * (icingRect.height - 20) + 5;
 
     addCandle(left, top);
   }
 }
 
   cake.addEventListener("click", function (event) {
-  const rect = cake.getBoundingClientRect();
+  const icing = cake.querySelector(".icing");
+  if (!icing) return;
 
-  const x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
+  const cakeRect = cake.getBoundingClientRect();
+  const icingRect = icing.getBoundingClientRect();
 
-  const creamTopStart = rect.height * 0.05;
-  const creamTopEnd   = rect.height * 0.30;
+  let x = event.clientX;
+  let y = event.clientY;
 
-  // Clamp Y to cream area
-  y = Math.min(Math.max(y, creamTopStart), creamTopEnd);
+  // Clamp click to icing area
+  x = Math.min(Math.max(x, icingRect.left), icingRect.right);
+  y = Math.min(Math.max(y, icingRect.top), icingRect.bottom);
 
-  addCandle(x, y);
+  addCandle(
+    x - cakeRect.left,
+    y - cakeRect.top
+  );
 });
 
   function isBlowing() {

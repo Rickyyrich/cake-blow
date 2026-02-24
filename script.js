@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
   const cake = document.querySelector(".cake");
   const candleCountDisplay = document.getElementById("candleCount");
-  let candles = [];
+  const params = new URLSearchParams(window.location.search);
+  let candleCount = parseInt(params.get("candles")) || 27;
   let audioContext;
   let analyser;
   let microphone;

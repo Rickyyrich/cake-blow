@@ -59,14 +59,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function placeInitialCandles(count) {
-  const icingWidth = icing.offsetWidth;
-  const icingHeight = icing.offsetHeight;
+  const icingRect = icing.getBoundingClientRect();
+  const cakeRect = cake.getBoundingClientRect();
 
   for (let i = 0; i < count; i++) {
     // Random X inside icing
-    const x = Math.random() * icingWidth;
-    // Fixed Y so candles are only on top of icing
-    const y = 0; // you can adjust like 0–10px if you want slight vertical variation
+    const x = Math.random() * icingRect.width;
+
+    // Random Y inside icing
+    const y = Math.random() * icingRect.height;
 
     addCandle(x, y);
   }

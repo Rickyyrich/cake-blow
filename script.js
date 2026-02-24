@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   message.style.zIndex = "9999";
   message.style.transform = "translate(-50%, -50%) scale(1)";
 }
-
+  }
   function addCandle(x, y) {
     const candle = document.createElement("div");
     candle.className = "candle";

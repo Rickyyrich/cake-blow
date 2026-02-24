@@ -39,38 +39,44 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addInitialCandles(count) {
-  const icing = cake.querySelector(".icing");
-  if (!icing) return;
+  const topLayer = cake.querySelector(".layer-top");
+  if (!topLayer) return;
 
   const cakeRect = cake.getBoundingClientRect();
-  const icingRect = icing.getBoundingClientRect();
+  const layerRect = topLayer.getBoundingClientRect();
+
+  // Define icing zone ABOVE the top layer
+  const icingHeight = layerRect.height * 0.5;
 
   for (let i = 0; i < count; i++) {
     const left =
-      icingRect.left - cakeRect.left +
-      Math.random() * (icingRect.width - 20) + 10;
+      layerRect.left - cakeRect.left +
+      Math.random() * (layerRect.width - 30) + 15;
 
     const top =
-      icingRect.top - cakeRect.top +
-      Math.random() * (icingRect.height - 20) + 5;
+      layerRect.top - cakeRect.top -
+      Math.random() * icingHeight + 5;
 
     addCandle(left, top);
   }
 }
 
   cake.addEventListener("click", function (event) {
-  const icing = cake.querySelector(".icing");
-  if (!icing) return;
+  const topLayer = cake.querySelector(".layer-top");
+  if (!topLayer) return;
 
   const cakeRect = cake.getBoundingClientRect();
-  const icingRect = icing.getBoundingClientRect();
+  const layerRect = topLayer.getBoundingClientRect();
 
   let x = event.clientX;
   let y = event.clientY;
 
-  // Clamp click to icing area
-  x = Math.min(Math.max(x, icingRect.left), icingRect.right);
-  y = Math.min(Math.max(y, icingRect.top), icingRect.bottom);
+  const icingTop = layerRect.top - layerRect.height * 0.5;
+  const icingBottom = layerRect.top;
+
+  // Clamp click to icing zone
+  x = Math.min(Math.max(x, layerRect.left), layerRect.right);
+  y = Math.min(Math.max(y, icingTop), icingBottom);
 
   addCandle(
     x - cakeRect.left,

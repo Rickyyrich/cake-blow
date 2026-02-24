@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const cake = document.querySelector(".cake");
   const icing = document.querySelector(".icing");
   const candleCountDisplay = document.getElementById("candleCount");
+  const birthdayMessage = document.getElementById("birthdayMessage");
 
   const params = new URLSearchParams(window.location.search);
   let initialCandles = parseInt(params.get("candles")) || 27;
@@ -10,14 +11,22 @@ document.addEventListener("DOMContentLoaded", function () {
   let analyser;
   let microphone;
 
-  // ✅ THIS WAS MISSING
   const candles = [];
 
-  function updateCandleCount() {
-    const activeCandles = candles.filter(
+  function getActiveCandleCount() {
+    return candles.filter(
       (candle) => !candle.classList.contains("out")
     ).length;
-    candleCountDisplay.textContent = activeCandles;
+  }
+
+  function updateCandleCount() {
+    const active = getActiveCandleCount();
+    candleCountDisplay.textContent = active;
+
+    // 🎉 SHOW MESSAGE WHEN ALL CANDLES ARE OUT
+    if (active === 0 && candles.length > 0) {
+      birthdayMessage.style.display = "block";
+    }
   }
 
   function addCandle(x, y) {
@@ -35,21 +44,16 @@ document.addEventListener("DOMContentLoaded", function () {
     updateCandleCount();
   }
 
-  // 🎂 Place initial candles ONLY on icing
   function placeInitialCandles(count) {
     const rect = icing.getBoundingClientRect();
     const cakeRect = cake.getBoundingClientRect();
 
     for (let i = 0; i < count; i++) {
       const x =
-        rect.left -
-        cakeRect.left +
-        Math.random() * rect.width;
+        rect.left - cakeRect.left + Math.random() * rect.width;
 
       const y =
-        rect.top -
-        cakeRect.top +
-        Math.random() * rect.height;
+        rect.top - cakeRect.top + Math.random() * rect.height;
 
       addCandle(x, y);
     }
@@ -64,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
       event.clientY < icingRect.top ||
       event.clientY > icingRect.bottom
     ) {
-      return; // ❌ clicks outside icing ignored
+      return;
     }
 
     const cakeRect = cake.getBoundingClientRect();
@@ -112,6 +116,5 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // 🚀 INIT
   placeInitialCandles(initialCandles);
 });

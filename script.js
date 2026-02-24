@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const params = new URLSearchParams(window.location.search);
   let initialCandles = parseInt(params.get("candles")) || 27;
-
+  let birthdayShown = false;
   let audioContext;
   let analyser;
   let microphone;
@@ -20,14 +20,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateCandleCount() {
-    const active = getActiveCandleCount();
-    candleCountDisplay.textContent = active;
+  const activeCandles = candles.filter(
+    (candle) => !candle.classList.contains("out")
+  ).length;
 
-    // 🎉 SHOW MESSAGE WHEN ALL CANDLES ARE OUT
-    if (active === 0 && candles.length > 0) {
-      birthdayMessage.style.display = "block";
-    }
+  candleCountDisplay.textContent = activeCandles;
+
+  // 🎉 SHOW MESSAGE WHEN ALL CANDLES ARE OUT
+  if (activeCandles === 0 && !birthdayShown) {
+    birthdayShown = true;
+    const message = document.getElementById("birthdayMessage");
+    message.style.display = "block";
   }
+}
 
   function addCandle(x, y) {
     const candle = document.createElement("div");

@@ -39,22 +39,34 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addInitialCandles(count) {
-    const rect = cake.getBoundingClientRect();
+  const rect = cake.getBoundingClientRect();
 
-    for (let i = 0; i < count; i++) {
-      const left = Math.random() * (rect.width - 30) + 15;
-      const top = Math.random() * (rect.height - 50) + 15;
-      addCandle(left, top);
-    }
+  const creamTopStart = rect.height * 0.05;  // 5% from top
+  const creamTopEnd   = rect.height * 0.30;  // 30% from top
+
+  for (let i = 0; i < count; i++) {
+    const left = Math.random() * (rect.width - 30) + 15;
+    const top =
+      Math.random() * (creamTopEnd - creamTopStart) + creamTopStart;
+
+    addCandle(left, top);
   }
+}
 
   cake.addEventListener("click", function (event) {
-    const rect = cake.getBoundingClientRect();
-    addCandle(
-      event.clientX - rect.left,
-      event.clientY - rect.top
-    );
-  });
+  const rect = cake.getBoundingClientRect();
+
+  const x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+
+  const creamTopStart = rect.height * 0.05;
+  const creamTopEnd   = rect.height * 0.30;
+
+  // Clamp Y to cream area
+  y = Math.min(Math.max(y, creamTopStart), creamTopEnd);
+
+  addCandle(x, y);
+});
 
   function isBlowing() {
     const dataArray = new Uint8Array(analyser.frequencyBinCount);

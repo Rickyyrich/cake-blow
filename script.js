@@ -1,33 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
   const cake = document.querySelector(".cake");
+  const icing = document.querySelector(".icing");
   const candleCountDisplay = document.getElementById("candleCount");
-  const birthdayMessage = document.getElementById("birthdayMessage");
 
   const params = new URLSearchParams(window.location.search);
-  const initialCandleCount = parseInt(params.get("candles")) || 27;
+  let initialCandles = parseInt(params.get("candles")) || 27;
 
-  let candles = [];
   let audioContext;
   let analyser;
   let microphone;
 
+  // ✅ THIS WAS MISSING
+  const candles = [];
+
   function updateCandleCount() {
-    const active = candles.filter(
-      (c) => !c.classList.contains("out")
+    const activeCandles = candles.filter(
+      (candle) => !candle.classList.contains("out")
     ).length;
-
-    candleCountDisplay.textContent = active;
-
-    if (active === 0 && birthdayMessage) {
-      birthdayMessage.style.display = "block";
-    }
+    candleCountDisplay.textContent = activeCandles;
   }
 
-  function addCandle(left, top) {
+  function addCandle(x, y) {
     const candle = document.createElement("div");
     candle.className = "candle";
-    candle.style.left = `${left}px`;
-    candle.style.top = `${top}px`;
+    candle.style.left = x + "px";
+    candle.style.top = y + "px";
 
     const flame = document.createElement("div");
     flame.className = "flame";
@@ -38,64 +35,83 @@ document.addEventListener("DOMContentLoaded", function () {
     updateCandleCount();
   }
 
-  function addInitialCandles(count) {
-  for (let i = 0; i < count; i++) {
-    const left = 30 + i * 12; // spread across top
-    const top = 20;          // ALWAYS on top
-    addCandle(left, top);
-  }
-}
+  // 🎂 Place initial candles ONLY on icing
+  function placeInitialCandles(count) {
+    const rect = icing.getBoundingClientRect();
+    const cakeRect = cake.getBoundingClientRect();
 
-cake.addEventListener("click", function () {
-  addCandle(40 + candles.length * 10, 20);
-});
+    for (let i = 0; i < count; i++) {
+      const x =
+        rect.left -
+        cakeRect.left +
+        Math.random() * rect.width;
+
+      const y =
+        rect.top -
+        cakeRect.top +
+        Math.random() * rect.height;
+
+      addCandle(x, y);
+    }
+  }
+
+  cake.addEventListener("click", function (event) {
+    const icingRect = icing.getBoundingClientRect();
+
+    if (
+      event.clientX < icingRect.left ||
+      event.clientX > icingRect.right ||
+      event.clientY < icingRect.top ||
+      event.clientY > icingRect.bottom
+    ) {
+      return; // ❌ clicks outside icing ignored
+    }
+
+    const cakeRect = cake.getBoundingClientRect();
+    const x = event.clientX - cakeRect.left;
+    const y = event.clientY - cakeRect.top;
+
+    addCandle(x, y);
+  });
 
   function isBlowing() {
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(dataArray);
-    const avg =
-      dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-    return avg > 40;
+
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
+    }
+
+    return sum / bufferLength > 40;
   }
 
   function blowOutCandles() {
     if (!isBlowing()) return;
 
-    let changed = false;
-
     candles.forEach((candle) => {
       if (!candle.classList.contains("out") && Math.random() > 0.5) {
         candle.classList.add("out");
-        changed = true;
       }
     });
 
-    if (changed) updateCandleCount();
+    updateCandleCount();
   }
 
-  // ⏳ IMPORTANT: wait for layout before adding candles
-  setTimeout(() => {
-    addInitialCandles(initialCandleCount);
-  }, 100);
-
-  function startMic() {
-  if (audioContext) return;
-
-  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    audioContext.resume();
-
-    analyser = audioContext.createAnalyser();
-    microphone = audioContext.createMediaStreamSource(stream);
-    microphone.connect(analyser);
-    analyser.fftSize = 256;
-
-    setInterval(blowOutCandles, 200);
-  });
-}
-
-// Chrome requires user interaction
-document.addEventListener("click", startMic, { once: true });
-document.addEventListener("touchstart", startMic, { once: true }););
+  if (navigator.mediaDevices?.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        analyser.fftSize = 256;
+        setInterval(blowOutCandles, 200);
+      });
   }
+
+  // 🚀 INIT
+  placeInitialCandles(initialCandles);
 });

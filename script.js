@@ -84,14 +84,24 @@ document.addEventListener("DOMContentLoaded", function () {
     addInitialCandles(initialCandleCount);
   }, 100);
 
-  if (navigator.mediaDevices?.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      microphone = audioContext.createMediaStreamSource(stream);
-      microphone.connect(analyser);
-      analyser.fftSize = 256;
-      setInterval(blowOutCandles, 200);
-    });
+  function startMic() {
+  if (audioContext) return;
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+
+    analyser = audioContext.createAnalyser();
+    microphone = audioContext.createMediaStreamSource(stream);
+    microphone.connect(analyser);
+    analyser.fftSize = 256;
+
+    setInterval(blowOutCandles, 200);
+  });
+}
+
+// Chrome requires user interaction
+document.addEventListener("click", startMic, { once: true });
+document.addEventListener("touchstart", startMic, { once: true }););
   }
 });

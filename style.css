@@ -3,14 +3,20 @@ body {
   margin: 0;
   padding: 0;
 }
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 /* =======================
    CANDLE COUNT BANNER
    ======================= */
 .candle-count-display {
   text-align: center;
-  margin-top: 150px;
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: 30px;
   font-family: 'Arial', sans-serif;
   font-size: 20px;
   color: #6A4B18;
@@ -38,9 +44,6 @@ body {
   position: relative;      /* needed for candles */
   width: 250px;
   height: 200px;
-  margin: 0 auto;
-  margin-top: 20px;
-  z-index: 1;
 }
 
 /* =======================

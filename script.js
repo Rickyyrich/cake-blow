@@ -39,34 +39,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addInitialCandles(count) {
-  const rect = cake.getBoundingClientRect();
-
-  // 🔒 HARD-DEFINED ICING ZONE (px, not %)
-  const icingTop = 20;   // px from top of cake
-  const icingBottom = 55; // px from top of cake
-
   for (let i = 0; i < count; i++) {
-    const left = Math.random() * (rect.width - 30) + 15;
-    const top =
-      Math.random() * (icingBottom - icingTop) + icingTop;
-
+    const left = 30 + i * 12; // spread across top
+    const top = 20;          // ALWAYS on top
     addCandle(left, top);
   }
 }
 
-  cake.addEventListener("click", function (event) {
-  const rect = cake.getBoundingClientRect();
-
-  let x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
-
-  const icingTop = 20;
-  const icingBottom = 55;
-
-  // Clamp clicks to top icing zone
-  y = Math.min(Math.max(y, icingTop), icingBottom);
-
-  addCandle(x, y);
+cake.addEventListener("click", function () {
+  addCandle(40 + candles.length * 10, 20);
 });
 
   function isBlowing() {

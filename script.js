@@ -28,10 +28,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 🎉 SHOW MESSAGE WHEN ALL CANDLES ARE OUT
   if (activeCandles === 0 && !birthdayShown) {
-    birthdayShown = true;
-    const message = document.getElementById("birthdayMessage");
-    message.style.display = "block";
+  birthdayShown = true;
+
+  const message = document.getElementById("birthdayMessage");
+
+  if (!message) {
+    console.error("birthdayMessage element not found");
+    return;
   }
+
+  message.style.display = "flex";
+  message.style.opacity = "1";
+  message.style.visibility = "visible";
+  message.style.zIndex = "9999";
+  message.style.transform = "translate(-50%, -50%) scale(1)";
 }
 
   function addCandle(x, y) {

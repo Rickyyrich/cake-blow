@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const birthdayMessage = document.getElementById("birthdayMessage");
 
   const params = new URLSearchParams(window.location.search);
-  let initialCandleCount = parseInt(params.get("candles")) || 27;
+  const initialCandleCount = parseInt(params.get("candles")) || 27;
 
   let candles = [];
   let audioContext;
@@ -12,13 +12,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let microphone;
 
   function updateCandleCount() {
-    const activeCandles = candles.filter(
-      (candle) => !candle.classList.contains("out")
+    const active = candles.filter(
+      (c) => !c.classList.contains("out")
     ).length;
 
-    candleCountDisplay.textContent = activeCandles;
+    candleCountDisplay.textContent = active;
 
-    if (activeCandles === 0 && birthdayMessage) {
+    if (active === 0 && birthdayMessage) {
       birthdayMessage.style.display = "block";
     }
   }
@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function addCandle(left, top) {
     const candle = document.createElement("div");
     candle.className = "candle";
-    candle.style.left = left + "px";
-    candle.style.top = top + "px";
+    candle.style.left = `${left}px`;
+    candle.style.top = `${top}px`;
 
     const flame = document.createElement("div");
     flame.className = "flame";
@@ -42,68 +42,56 @@ document.addEventListener("DOMContentLoaded", function () {
     const rect = cake.getBoundingClientRect();
 
     for (let i = 0; i < count; i++) {
-      const left = Math.random() * (rect.width - 20) + 10;
-      const top = Math.random() * (rect.height - 40) + 10;
+      const left = Math.random() * (rect.width - 30) + 15;
+      const top = Math.random() * (rect.height - 50) + 15;
       addCandle(left, top);
     }
   }
 
   cake.addEventListener("click", function (event) {
     const rect = cake.getBoundingClientRect();
-    const left = event.clientX - rect.left;
-    const top = event.clientY - rect.top;
-    addCandle(left, top);
+    addCandle(
+      event.clientX - rect.left,
+      event.clientY - rect.top
+    );
   });
 
   function isBlowing() {
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(dataArray);
-
-    let sum = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      sum += dataArray[i];
-    }
-
-    let average = sum / bufferLength;
-    return average > 40;
+    const avg =
+      dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    return avg > 40;
   }
 
   function blowOutCandles() {
-    let blownOut = false;
+    if (!isBlowing()) return;
 
-    if (isBlowing()) {
-      candles.forEach((candle) => {
-        if (!candle.classList.contains("out") && Math.random() > 0.5) {
-          candle.classList.add("out");
-          blownOut = true;
-        }
-      });
-    }
+    let changed = false;
 
-    if (blownOut) {
-      updateCandleCount();
-    }
+    candles.forEach((candle) => {
+      if (!candle.classList.contains("out") && Math.random() > 0.5) {
+        candle.classList.add("out");
+        changed = true;
+      }
+    });
+
+    if (changed) updateCandleCount();
   }
 
-  // 🔥 Add candles immediately on load
-  addInitialCandles(initialCandleCount);
+  // ⏳ IMPORTANT: wait for layout before adding candles
+  setTimeout(() => {
+    addInitialCandles(initialCandleCount);
+  }, 100);
 
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(function (stream) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        setInterval(blowOutCandles, 200);
-      })
-      .catch(function (err) {
-        console.log("Unable to access microphone: " + err);
-      });
-  } else {
-    console.log("getUserMedia not supported on your browser!");
+  if (navigator.mediaDevices?.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      microphone = audioContext.createMediaStreamSource(stream);
+      microphone.connect(analyser);
+      analyser.fftSize = 256;
+      setInterval(blowOutCandles, 200);
+    });
   }
 });

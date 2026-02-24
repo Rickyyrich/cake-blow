@@ -63,11 +63,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const cakeRect = cake.getBoundingClientRect();
 
   for (let i = 0; i < count; i++) {
-    // Random X inside icing
-    const x = Math.random() * icingRect.width;
+    const x =
+      icingRect.left -
+      cakeRect.left +
+      Math.random() * icingRect.width;
 
-    // Random Y inside icing
-    const y = Math.random() * icingRect.height;
+    const y =
+      icingRect.top -
+      cakeRect.top +
+      Math.random() * icingRect.height;
 
     addCandle(x, y);
   }

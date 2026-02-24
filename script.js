@@ -28,19 +28,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 🎉 SHOW MESSAGE WHEN ALL CANDLES ARE OUT
   if (activeCandles === 0 && !birthdayShown) {
-    birthdayShown = true;
+  birthdayShown = true;
 
-    const message = document.getElementById("birthdayMessage");
+  const message = document.getElementById("birthdayMessage");
 
-    if (message) {
-      message.style.display = "flex";
-      message.style.opacity = "1";
-      message.style.visibility = "visible";
-      message.style.zIndex = "9999";
-      message.style.transform = "translate(-50%, -50%) scale(1)";
-    } else {
-      console.warn("birthdayMessage not found (safe to ignore)");
-    }
+  if (message) {
+    message.style.display = "flex";
+    message.style.opacity = "1";
+    message.style.visibility = "visible";
+    message.style.zIndex = "9999";
+    message.style.transform = "translate(-50%, -50%) scale(1)";
+
+    // 🎊 Confetti
+    launchConfetti();
+
+    // 🎵 Birthday tune
+    const audio = document.getElementById("birthdayAudio");
+    if (audio) audio.play();
+  } else {
+    console.warn("birthdayMessage not found (safe to ignore)");
   }
 }
   function addCandle(x, y) {
